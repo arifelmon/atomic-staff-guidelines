@@ -157,10 +157,34 @@
   @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
   .animate-in { animation: fadeUp 0.6s ease both; }
 
+  /* HAMBURGER */
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: 1px solid var(--border); border-radius: 8px; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: all 0.3s; }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 65px; left: 0; right: 0;
+    background: rgba(5,5,7,0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 20px;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 99;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu .nav-pill { text-align: center; padding: 12px 16px; font-size: 15px; }
+  .mobile-menu .lang-switcher { justify-content: center; margin: 4px 0 0; }
+
   @media(max-width:768px){
     .main-cards{grid-template-columns:1fr;max-width:400px}
     .topbar{padding:14px 20px}
     .topbar-nav{display:none}
+    .hamburger{display:flex}
     .hero{padding:100px 24px 60px}
     .section{padding:100px 24px 60px}
     .role-cards{grid-template-columns:1fr}
@@ -204,7 +228,22 @@
     <button class="lang-btn" onclick="setLang('id')">ID</button>
   </div>
 </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a class="nav-pill" onclick="showHome();closeMobileMenu()" href="#">Home</a>
+  <a class="nav-pill" onclick="showSection('rules');closeMobileMenu()" href="#">Rules</a>
+  <a class="nav-pill" onclick="showSection('guide');closeMobileMenu()" href="#">Guide</a>
+  <a class="nav-pill" onclick="showSection('jobdesk');closeMobileMenu()" href="#">Jobdesk</a>
+  <div class="lang-switcher" style="justify-content:center;margin-top:4px;">
+    <button class="lang-btn active" id="mLangEn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="mLangId" onclick="setLang('id')">ID</button>
+  </div>
+</div>
 
 <div class="page">
 
@@ -574,7 +613,7 @@
     <p class="section-desc">Responsibilities and key duties for every position in the Atomic staff structure.</p>
   </div>
 
-  <div class="notice animate-in">
+  <div class="notice animate-in" data-en="The ProDeTe (Promote · Demote · Terminate) process applies up to the <strong>Community Manager</strong> level. Recruitment for <strong>RDOM</strong> and <strong>Executive Director</strong> requires full approval from the RDOM, Executive Director, and Owner." data-id="Proses ProDeTe (Promote · Demote · Terminate) berlaku hingga level <strong>Community Manager</strong>. Rekrutmen untuk <strong>RDOM</strong> dan <strong>Executive Director</strong> memerlukan persetujuan penuh dari RDOM, Executive Director, dan Owner.">
     The ProDeTe (Promote · Demote · Terminate) process applies up to the <strong>Community Manager</strong> level. Recruitment for <strong>RDOM</strong> and <strong>Executive Director</strong> requires full approval from the RDOM, Executive Director, and Owner.
   </div>
 
@@ -904,6 +943,17 @@
   "♥ by arifelmon": "♥ oleh arifelmon"
 };
 
+  function toggleMobileMenu() {
+    const btn = document.getElementById('hamburgerBtn');
+    const menu = document.getElementById('mobileMenu');
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+  }
+  function closeMobileMenu() {
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+
   function setLang(lang) {
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
@@ -931,6 +981,11 @@
       }
     }
     
+    // Translate elements with data-en / data-id attributes
+    document.querySelectorAll('[data-en][data-id]').forEach(el => {
+      el.innerHTML = lang === 'id' ? el.dataset.id : el.dataset.en;
+    });
+
     // Translate main content areas only
     ['#home', '#rules', '#guide', '#jobdesk', '.topbar-nav'].forEach(sel => {
       const el = document.querySelector(sel);
