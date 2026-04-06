@@ -1,1 +1,1 @@
-# atomic-staff-gudelines
+# atomic-staff-guidelines
